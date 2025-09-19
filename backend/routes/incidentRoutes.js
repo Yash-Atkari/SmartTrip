@@ -2,22 +2,23 @@ const express = require("express");
 const router = express.Router();
 const incidentController = require("../controllers/incidentController");
 const Incident = require("../models/Incident");
+const ensureAuth = require("../middleware/auth");
 
 // Protect routes using passport middleware
 // const passport = require("passport");
 // const auth = passport.authenticate("jwt", { session: false });
 
 // Report an incident
-router.post("/", /*auth,*/ incidentController.createIncident);
+router.post("/", ensureAuth, incidentController.createIncident);
 
 // Get all incidents (for responders/authorities)
-router.get("/", /*auth,*/ incidentController.getAllIncidents);
+router.get("/", ensureAuth, incidentController.getAllIncidents);
 
 // Get incidents of the logged-in user
-router.get("/me", /*auth,*/ incidentController.getUserIncidents);
+router.get("/me", ensureAuth, incidentController.getUserIncidents);
 
 // GET /api/incidents/near?lat=22.72&lng=75.85&radius=2000
-router.get("/near", async (req, res) => {
+router.get("/near", ensureAuth, async (req, res) => {
   try {
     const { lat, lng, radius } = req.query;
 

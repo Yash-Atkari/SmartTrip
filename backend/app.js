@@ -3,6 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const session = require("express-session");
+const passport = require("passport");
 
 // Load environment variables
 dotenv.config();
@@ -32,10 +34,30 @@ app.get("/", (req, res) => {
 // const userRoutes = require("./routes/userRoutes");
 const incidentRoutes = require("./routes/incidentRoutes");
 const geofenceRoutes = require("./routes/geofenceRoutes");
+const authRoutes = require("./routes/authRoutes");
 
-// // app.use("/api/users", userRoutes);
-app.use("/api/incidents", incidentRoutes);
-app.use("/api/geofences", geofenceRoutes);
+const ensureAuth = require("./middleware/auth");
+
+// Session middleware (use env var for secret in production)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "change_this_in_prod",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }, // set secure:true in prod with HTTPS
+  })
+);
+
+// Passport init
+app.use(passport.initialize());
+app.use(passport.session());
+require("./config/passport")(passport);
+
+// Routes
+app.use("/api/auth", authRoutes);
+
+app.use("/api/incidents", ensureAuth, incidentRoutes);
+app.use("/api/geofences", ensureAuth, geofenceRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
