@@ -35,6 +35,7 @@ app.get("/", (req, res) => {
 const incidentRoutes = require("./routes/incidentRoutes");
 const geofenceRoutes = require("./routes/geofenceRoutes");
 const authRoutes = require("./routes/authRoutes");
+const locationRoutes = require("./routes/locationRoutes");
 
 const ensureAuth = require("./middleware/auth");
 
@@ -58,6 +59,8 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/incidents", ensureAuth, incidentRoutes);
 app.use("/api/geofences", ensureAuth, geofenceRoutes);
+
+app.use("/api/location", locationRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

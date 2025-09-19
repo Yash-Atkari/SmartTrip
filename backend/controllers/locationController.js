@@ -11,7 +11,7 @@ exports.updateLocation = async (req, res) => {
 
     // Save location
     const location = await Location.create({
-      user: req.user._id,
+      user: req.user ? req.user._id : "68cd619c006909dbb219e4b3",
       lat,
       lng,
     });
