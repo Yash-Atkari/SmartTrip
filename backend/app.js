@@ -36,6 +36,7 @@ const incidentRoutes = require("./routes/incidentRoutes");
 const geofenceRoutes = require("./routes/geofenceRoutes");
 const authRoutes = require("./routes/authRoutes");
 const locationRoutes = require("./routes/locationRoutes");
+const sosRoutes = require("./routes/sos");
 
 const ensureAuth = require("./middleware/auth");
 
@@ -57,10 +58,12 @@ require("./config/passport")(passport);
 // Routes
 app.use("/api/auth", authRoutes);
 
-app.use("/api/incidents", ensureAuth, incidentRoutes);
+app.use("/api/incidents", incidentRoutes);
 app.use("/api/geofences", ensureAuth, geofenceRoutes);
 
 app.use("/api/location", locationRoutes);
+
+app.use("/api/sos", sosRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

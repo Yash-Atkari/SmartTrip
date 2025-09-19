@@ -4,6 +4,9 @@ const incidentController = require("../controllers/incidentController");
 const Incident = require("../models/Incident");
 const ensureAuth = require("../middleware/auth");
 
+const { getActiveIncidents } = require("../controllers/incidentController");
+const { closeIncident } = require("../controllers/incidentController");
+
 // Protect routes using passport middleware
 // const passport = require("passport");
 // const auth = passport.authenticate("jwt", { session: false });
@@ -40,5 +43,11 @@ router.get("/near", ensureAuth, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch nearby incidents", details: err });
   }
 });
+
+// Active SOS incidents for dashboard
+router.get("/active", getActiveIncidents);
+
+// Close an incident by ID
+router.put("/close/:id", closeIncident);
 
 module.exports = router;

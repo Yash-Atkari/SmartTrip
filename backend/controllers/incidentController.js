@@ -48,3 +48,43 @@ exports.getUserIncidents = async (req, res) => {
     res.status(500).json({ error: "Unable to fetch your incidents" });
   }
 };
+
+exports.getActiveIncidents = async (req, res) => {
+  try {
+    const incidents = await Incident.find({ type: "SOS", status: "open" })
+      .populate("userId", "email phone") // show user info
+      .sort({ timestamp: -1 });
+
+    res.json({
+      success: true,
+      count: incidents.length,
+      incidents,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+exports.closeIncident = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const incident = await Incident.findByIdAndUpdate(
+      id,
+      { status: "closed" },
+      { new: true }
+    );
+
+    if (!incident) {
+      return res.status(404).json({ success: false, message: "Incident not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "✅ Incident closed successfully",
+      incident,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

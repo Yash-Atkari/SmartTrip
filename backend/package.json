@@ -19,6 +19,7 @@
     "mongoose": "^8.18.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "twilio": "^5.10.0",
     "uuid": "^13.0.0"
   }
 }
