@@ -141,6 +141,28 @@ app.use("/api/location", locationRoutes);
 
 app.use("/api/sos", sosRoutes);
 
+app.get("/api/weather", async (req, res) => {
+  const { lat, lon } = req.query;
+  if (!lat || !lon) return res.status(400).json({ error: "Missing coordinates" });
+
+  try {
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+    const response = await axios.get(url);
+
+    res.json({
+      temp: response.data.main.temp,
+      weather: response.data.weather[0].main,
+      description: response.data.weather[0].description,
+      humidity: response.data.main.humidity,
+      windSpeed: response.data.wind.speed,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch weather" });
+  }
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
