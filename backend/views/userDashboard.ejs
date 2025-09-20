@@ -96,6 +96,30 @@
       </div>
     </div>
   </div>
+
+  <!-- Weather Modal -->
+  <div class="modal fade" id="weatherModal" tabindex="-1" aria-labelledby="weatherModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title" id="weatherModalLabel">Check Weather</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="weatherForm">
+            <div class="mb-3">
+              <label for="cityInput" class="form-label">Enter City Name</label>
+              <input type="text" class="form-control" id="cityInput" placeholder="e.g., Nagpur" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Get Weather</button>
+          </form>
+          <div id="weatherResult" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
     document.getElementById("shareLocationBtn").addEventListener("click", async () => {
       try {
@@ -146,12 +170,201 @@
         alert("❌ Something went wrong while requesting location.");
       }
     });
+
+    const weatherBtn = document.getElementById("weatherBtn");
+const weatherModal = new bootstrap.Modal(document.getElementById("weatherModal"));
+const weatherForm = document.getElementById("weatherForm");
+const weatherResult = document.getElementById("weatherResult");
+
+weatherBtn.addEventListener("click", () => {
+  weatherResult.innerHTML = "";
+  document.getElementById("cityInput").value = "";
+  weatherModal.show();
+});
+
+weatherForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const city = document.getElementById("cityInput").value.trim();
+  if (!city) return;
+
+  weatherResult.innerHTML = "Fetching weather... 🌤️";
+
+  try {
+    const apiKey = "d7ceca126177214b95c594fbc3a4e0fa";
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
+    const data = await res.json();
+
+    if (data.cod !== 200) {
+      weatherResult.innerHTML = `❌ ${data.message}`;
+      return;
+    }
+
+    const windSpeedKmh = (data.wind.speed * 3.6).toFixed(1);
+
+    weatherResult.innerHTML = `
+      <h5>${data.name}, ${data.sys.country}</h5>
+      <p>Temperature: ${data.main.temp.toFixed(1)}°C</p>
+      <p>Feels Like: ${data.main.feels_like.toFixed(1)}°C</p>
+      <p>Condition: ${data.weather[0].description}</p>
+      <p>Humidity: ${data.main.humidity}%</p>
+      <p>Wind: ${windSpeedKmh} km/h</p>
+      <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="icon">
+    `;
+  } catch (err) {
+    console.error(err);
+    weatherResult.innerHTML = "❌ Could not fetch weather. Try again.";
+  }
+});
+
   </script>
   <script>
     const safeLocations = [
-      { name: "Hotel GreenTree", lat: 22.7205, lng: 75.8572 },
-      { name: "Police Station Central", lat: 22.7172, lng: 75.8565 },
-      { name: "Airport", lat: 22.7278, lng: 75.8011 }
+      // Jammu & Kashmir / Ladakh
+      { name: "Srinagar Airport / Lal Chowk (Srinagar)", lat: 33.9870, lng: 74.7749 },
+      { name: "Jammu Tawi Railway / Tourist Police (Jammu)", lat: 32.7090, lng: 74.7973 },
+      { name: "Gulmarg Tourist Area / Police (Gulmarg)", lat: 34.0530, lng: 74.3817 },
+      { name: "Leh Kushok Bakula Rimpochee Airport (Leh)", lat: 34.1637, lng: 77.5859 },
+
+      // Punjab & Haryana
+      { name: "Golden Temple / Tourist Police (Amritsar)", lat: 31.6200, lng: 74.8765 },
+      { name: "Chandigarh Tourist Office / Sector 17 (Chandigarh)", lat: 30.7333, lng: 76.7794 },
+      { name: "Patiala Police / Tourist Hub (Patiala)", lat: 30.3398, lng: 76.3869 },
+
+      // Delhi & NCR
+      { name: "Indira Gandhi International Airport (New Delhi)", lat: 28.5562, lng: 77.1003 },
+      { name: "India Gate / Tourist Police (New Delhi)", lat: 28.6129, lng: 77.2295 },
+      { name: "Qutub Minar / Mehrauli Tourist Desk (Delhi)", lat: 28.5244, lng: 77.1855 },
+
+      // Rajasthan
+      { name: "Jaipur Police Control Room / Hawa Mahal (Jaipur)", lat: 26.9124, lng: 75.7873 },
+      { name: "Taj Mahal / Tourist Police (Agra)", lat: 27.1767, lng: 78.0081 },
+      { name: "Jodhpur Mehrangarh / Tourist Office (Jodhpur)", lat: 26.2918, lng: 73.0169 },
+      { name: "Jaisalmer Fort / Tourist Desk (Jaisalmer)", lat: 26.9157, lng: 70.9083 },
+      { name: "Udaipur City Palace / Tourist Police (Udaipur)", lat: 24.5854, lng: 73.7125 },
+
+      // Uttar Pradesh & Uttarakhand
+      { name: "Varanasi Ghats / Tourist Police (Varanasi)", lat: 25.3176, lng: 82.9739 },
+      { name: "Lucknow Tourist Office / Hazratganj (Lucknow)", lat: 26.8467, lng: 80.9462 },
+      { name: "Dehradun / ISBT / Tourist Help (Dehradun)", lat: 30.3165, lng: 78.0322 },
+      { name: "Rishikesh Tourist Police / Laxman Jhula area (Rishikesh)", lat: 30.0869, lng: 78.2676 },
+      { name: "Nainital Mall Road / Tourist Desk (Nainital)", lat: 29.3919, lng: 79.4542 },
+
+      // Himachal Pradesh
+      { name: "Shimla Ridge / Tourist Police (Shimla)", lat: 31.1048, lng: 77.1734 },
+      { name: "Manali Mall Road / Tourist Help (Manali)", lat: 32.2396, lng: 77.1887 },
+
+      // Madhya Pradesh & Chhattisgarh
+      { name: "Khajuraho Temple Complex / Tourist Police (Khajuraho)", lat: 24.8316, lng: 79.9190 },
+      { name: "Bhopal Upper Lake / Tourist Desk (Bhopal)", lat: 23.2599, lng: 77.4126 },
+      { name: "Gwalior Fort / Tourist Police (Gwalior)", lat: 26.2183, lng: 78.1828 },
+      { name: "Pench/Kanha entry / Forest Dept Help (near Jabalpur)", lat: 23.1815, lng: 80.0473 },
+      { name: "Raipur City / Tourist Help (Raipur)", lat: 21.2514, lng: 81.6296 },
+
+      // Gujarat & Daman & Diu
+      { name: "Ahmedabad Sabarmati / Tourist Police (Ahmedabad)", lat: 23.0225, lng: 72.5714 },
+      { name: "Somnath Temple / Tourist Help (Somnath)", lat: 20.8987, lng: 70.4066 },
+      { name: "Dwarka / Dwarkadhish Temple tourist area (Dwarka)", lat: 22.2410, lng: 68.9683 },
+      { name: "Bhuj / Rann of Kutch tourist desk (Bhuj)", lat: 23.2415, lng: 69.6669 },
+      { name: "Diu Airport / Diu Beach area (Diu)", lat: 20.7143, lng: 70.9216 },
+
+      // Maharashtra
+      { name: "Chhatrapati Shivaji Maharaj Intl Airport (Mumbai)", lat: 19.0896, lng: 72.8656 },
+      { name: "Gateway of India / Tourist Police (Mumbai)", lat: 18.9220, lng: 72.8347 },
+      { name: "Pune Railway / FC Road tourist area (Pune)", lat: 18.5204, lng: 73.8567 },
+      { name: "Aurangabad / Ajanta-Ellora tourist hub (Aurangabad)", lat: 19.8762, lng: 75.3433 },
+      { name: "Mahabaleshwar / Panchgani tourism safety desk (Mahabaleshwar)", lat: 17.9243, lng: 73.6835 },
+
+      // Goa
+      { name: "Dabolim / Goa Airport / Tourist Police (Dabolim)", lat: 15.3807, lng: 73.8315 },
+      { name: "Panaji / Church of Our Lady of the Immaculate Conception / Tourist Help (Panaji)", lat: 15.4909, lng: 73.8278 },
+
+      // Karnataka & Goa-adjacent
+      { name: "Bengaluru Kempegowda Intl Airport / Tourist Desk (Bengaluru)", lat: 13.1986, lng: 77.7066 },
+      { name: "Mysuru Palace / Tourist Police (Mysuru)", lat: 12.2958, lng: 76.6394 },
+      { name: "Hampi UNESCO site / Tourist Help (Hampi)", lat: 15.3350, lng: 76.4600 },
+
+      // Kerala
+      { name: "Cochin / Fort Kochi tourist desk (Kochi)", lat: 9.9312, lng: 76.2673 },
+      { name: "Kovalam / Lighthouse area (Thiruvananthapuram)", lat: 8.4824, lng: 76.9455 },
+      { name: "Munnar hill station tourist office (Munnar)", lat: 10.0889, lng: 77.0595 },
+      { name: "Alleppey / Backwaters tourist landing (Alappuzha)", lat: 9.4981, lng: 76.3388 },
+
+      // Tamil Nadu & Puducherry
+      { name: "Chennai Intl Airport / Marina Beach tourist police (Chennai)", lat: 12.9941, lng: 80.1709 },
+      { name: "Mahabalipuram Shore Temple tourist area (Mahabalipuram)", lat: 12.6288, lng: 80.1810 },
+      { name: "Pondicherry Promenade / Tourist Office (Puducherry)", lat: 11.9416, lng: 79.8083 },
+      { name: "Madurai Meenakshi Temple / Tourist Desk (Madurai)", lat: 9.9252, lng: 78.1198 },
+
+      // Andhra Pradesh & Telangana
+      { name: "Tirupati Balaji Temple / Tourist Police (Tirupati)", lat: 13.6288, lng: 79.4192 },
+      { name: "Visakhapatnam RK Beach / Tourist Help (Visakhapatnam)", lat: 17.6868, lng: 83.2185 },
+      { name: "Hyderabad Rajiv Gandhi Intl Airport / Tourist Desk (Hyderabad)", lat: 17.2403, lng: 78.4294 },
+
+      // Odisha & Bengal coast
+      { name: "Bhubaneswar / Lingaraj Temple tourist area (Bhubaneswar)", lat: 20.2961, lng: 85.8245 },
+      { name: "Puri Jagannath / Puri Tourist Police (Puri)", lat: 19.8135, lng: 85.8285 },
+      { name: "Konark Sun Temple / Tourist Desk (Konark)", lat: 19.8876, lng: 86.0941 },
+
+      // West Bengal & Sunderbans
+      { name: "Kolkata Netaji Subhas Chandra Bose Intl Airport (Kolkata)", lat: 22.6541, lng: 88.4467 },
+      { name: "Victoria Memorial / Tourism Desk (Kolkata)", lat: 22.5448, lng: 88.3426 },
+      { name: "Darjeeling Mall / Tourist Police (Darjeeling)", lat: 27.0360, lng: 88.2627 },
+      { name: "Sundarbans Tiger Reserve / Entry point (Godkhali)", lat: 21.9497, lng: 88.8195 },
+
+      // Assam & North East
+      { name: "Guwahati Lokpriya Gopinath Bordoloi Intl Airport (Guwahati)", lat: 26.1445, lng: 91.7362 },
+      { name: "Kaziranga National Park tourist entry (Kaziranga)", lat: 26.5775, lng: 93.1711 },
+      { name: "Majuli river island tourist hub (Majuli)", lat: 26.9570, lng: 92.7391 },
+      { name: "Shillong Police / Police Bazar tourist desk (Shillong)", lat: 25.5788, lng: 91.8933 },
+      { name: "Gangtok Tourist Office (Gangtok, Sikkim)", lat: 27.3314, lng: 88.6131 },
+
+      // North East — other state capitals
+      { name: "Imphal Tourist Desk (Imphal, Manipur)", lat: 24.8170, lng: 93.9368 },
+      { name: "Aizawl Tourist Help (Aizawl, Mizoram)", lat: 23.7271, lng: 92.7176 },
+      { name: "Itanagar Tourist Office (Itanagar, Arunachal)", lat: 27.0844, lng: 93.6053 },
+      { name: "Kohima Tourist Desk (Kohima, Nagaland)", lat: 25.6745, lng: 94.1103 },
+      { name: "Agartala Tourist Police / Airport (Agartala, Tripura)", lat: 23.8860, lng: 91.2404 },
+
+      // Islands
+      { name: "Port Blair Tourism Office / Veer Savarkar Airport (Port Blair, Andaman)", lat: 11.6667, lng: 92.7380 },
+      { name: "Havelock Island / Radhanagar Beach tourist hub (Swaraj Dweep)", lat: 11.9409, lng: 92.9905 },
+      { name: "Kavaratti / Lakshadweep tourist office (Kavaratti)", lat: 10.5667, lng: 72.6417 },
+
+      // Delhi-to-South corridor extras
+      { name: "Agra Fort / Tourist Police (Agra)", lat: 27.1790, lng: 78.0211 },
+      { name: "Chittorgarh Fort / Tourist Help (Chittorgarh)", lat: 24.8896, lng: 74.6294 },
+
+      // Southern coast & Western ghats
+      { name: "Gokarna Om Beach / Tourist Desk (Gokarna)", lat: 14.5496, lng: 74.3183 },
+      { name: "Mangalore New Mangalore Port / Tourist Help (Mangaluru)", lat: 12.9141, lng: 74.8560 },
+      { name: "Kovalam Lighthouse / Tourist Police (Kovalam)", lat: 8.4145, lng: 77.0421 },
+
+      // Popular hill / wildlife / heritage sites
+      { name: "Sanchi Stupa tourist desk (Sanchi, MP)", lat: 23.4857, lng: 77.7354 },
+      { name: "Ranthambore National Park entry / Tourist Help (Ranthambore)", lat: 26.0173, lng: 76.5026 },
+      { name: "Kaziranga / Kohora range (Kaziranga)", lat: 26.5775, lng: 93.1711 },
+      { name: "Bandipur National Park entry / Tourist Help (Bandipur)", lat: 11.7032, lng: 76.5226 },
+
+      // Large metro & transit hubs (extra)
+      { name: "Kochi International Airport / Tourist Desk (Kochi)", lat: 10.1520, lng: 76.4019 },
+      { name: "Trivandrum International Airport / Tourist Desk (Thiruvananthapuram)", lat: 8.4824, lng: 76.9205 },
+      { name: "Pune Lohegaon Airport (Pune)", lat: 18.5820, lng: 73.9190 },
+
+      // Cultural hubs & festival centers
+      { name: "Kochi Biennale / Fort Kochi tourist desk (Kochi)", lat: 9.9666, lng: 76.2428 },
+      { name: "Kumbh Mela Ghats (various years/location) — temporary tourist police (Prayagraj region)", lat: 25.4358, lng: 81.8463 },
+
+      // More city centers & safe hubs across India
+      { name: "Surat Tourist Desk / Railway (Surat)", lat: 21.1702, lng: 72.8311 },
+      { name: "Vadodara Railway / Sayaji Baug tourist area (Vadodara)", lat: 22.3072, lng: 73.1812 },
+      { name: "Tirunelveli / Nellai tourist desk (Tirunelveli)", lat: 8.7286, lng: 77.7076 },
+      { name: "Varkala Cliff / Tourist Help (Varkala)", lat: 8.7376, lng: 76.7161 },
+
+      // Final cluster: cross-country safe hubs
+      { name: "Lucknow Amausi Airport (Chaudhary Charan Singh Intl), tourist help (Lucknow)", lat: 26.7606, lng: 80.8859 },
+      { name: "Bengaluru City / MG Road tourist desk (Bengaluru)", lat: 12.9759, lng: 77.6050 },
+      { name: "Mumbai CST / Churchgate tourist area (Mumbai)", lat: 18.9419, lng: 72.8352 },
+      { name: "Kolkata Howrah Bridge / Esplanade tourist police (Kolkata)", lat: 22.5849, lng: 88.3463 }
     ];
 
     function getDistance(lat1, lon1, lat2, lon2) {
