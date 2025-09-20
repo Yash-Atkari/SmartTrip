@@ -1,0 +1,12 @@
+<div class="container mt-4">
+  <div class="alert alert-success">
+    🚨 SOS raised successfully! Your emergency contacts have been notified.
+  </div>
+  <p>
+    View your location: 
+    <a href="https://maps.google.com/?q=<%= incident.location.coordinates[1] %>,<%= incident.location.coordinates[0] %>" target="_blank">
+      📍 Open in Google Maps
+    </a>
+  </p>
+  <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
+</div>

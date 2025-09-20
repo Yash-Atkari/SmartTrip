@@ -1,27 +1,18 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const crypto = require("crypto"); // <-- use built-in
+const crypto = require("crypto");
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const UserSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   phone: { type: String, required: true },
-  password: { type: String, required: true },
   emergencyContacts: [{ name: String, phone: String }],
-  digitalId: { type: String, unique: true, default: () => crypto.randomUUID() }, // <--- changed
+  role: { type: String, enum: ["tourist", "responder"], default: "tourist" }, // 👈 new field
+  digitalId: { type: String, unique: true, default: () => crypto.randomUUID() },
   digitalIdHash: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 
-// Hash password before save
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-
-UserSchema.methods.matchPassword = function (enteredPassword) {
-  return bcrypt.compare(enteredPassword, this.password);
-};
+// Use email as the username field
+UserSchema.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model("User", UserSchema);

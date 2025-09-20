@@ -79,11 +79,7 @@ exports.closeIncident = async (req, res) => {
       return res.status(404).json({ success: false, message: "Incident not found" });
     }
 
-    res.json({
-      success: true,
-      message: "✅ Incident closed successfully",
-      incident,
-    });
+    res.redirect("/responder-dashboard");
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

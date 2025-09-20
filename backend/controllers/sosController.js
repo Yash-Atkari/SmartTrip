@@ -32,11 +32,8 @@ exports.raiseSOS = async (req, res) => {
       // or sendWhatsApp(contact.phone, message);
     }
 
-    res.json({
-      success: true,
-      message: "🚨 SOS raised successfully. Contacts notified.",
-      incident,
-    });
+    req.flash("success", "🚨 SOS raised successfully. Contacts notified.");
+    res.redirect("/dashboard");
   } catch (err) {
     console.error("Error in raiseSOS:", err);
     res.status(500).json({ success: false, error: err.message });
